@@ -123,6 +123,33 @@ mkScalar :: forall a. Elt a => Exp a -> AccScalar a
 -- | a smart constructor to generate scalars
 mkScalar = AccScalar . A.unit
 
+convertMatrix :: forall m n a. (KnownNat m, KnownNat n, Elt a)
+              => Acc (Array DIM2 a) -> Maybe (AccMatrix m n a)
+-- | A constructor that generates an `AccMatrix` from an unwrapped vector. The
+-- opposite of `unMatrix`. Returns `Nothing` if the dimensions don't fit.
+convertMatrix mat = if (A.lift $ Z :. m' :. n') == A.shape mat
+                    then Just $ AccMatrix mat
+                    else Nothing
+  where m' :: Int
+        m' = fromIntegral $ natVal (Proxy :: Proxy m)
+        n' :: Int
+        n' = fromIntegral $ natVal (Proxy :: Proxy n)
+
+convertVector :: forall n a. (KnownNat n, Elt a)
+              => Acc (Array DIM1 a) -> Maybe (AccVector n a)
+-- | A constructor that generates an `AccVector` from an unwrapped vector. The
+-- opposite of `unVector`. Returns `Nothing` if the dimensions don't fit.
+convertVector v = if (A.lift $ Z :. n') == A.shape v
+                  then Just $ AccVector v
+                  else Nothing
+  where n' :: Int
+        n' = fromIntegral $ natVal (Proxy :: Proxy n)
+
+convertScalar :: forall a. Elt a => Acc (Array DIM0 a) -> AccScalar a
+-- | A constructor that generates an `AccScalar` from an unwrapped scalar. The
+-- opposite of `unScalar`
+convertScalar s = AccScalar s
+
 withMatrixIndex ::
    (A.Shape ix, A.Slice ix, A.Lift Exp a) =>
    (Exp ix :. Exp Int :. Exp Int -> a) ->
