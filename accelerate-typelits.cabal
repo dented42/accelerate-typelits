@@ -21,7 +21,7 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
                   ,  Readme.md
                   ,  stack.yaml
-                  ,  stack-7.10.yaml
+                  ,  stack-7.10.3.yaml
 cabal-version:       >=1.22
 tested-with:         GHC == 8.2.2
 
